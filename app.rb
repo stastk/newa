@@ -1,9 +1,13 @@
 require 'sinatra'
-configure { set :server, :puma }
+
+set :run, true
+set :sever, 'thin'
+set :bind, '127.0.0.1'
+set :port, 80
+
+Process.daemon
 
 class Remapper < Sinatra::Base
-
-  #set :server, 'puma'
 
   get '/' do
     erb :index
