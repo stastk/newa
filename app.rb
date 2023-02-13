@@ -1,8 +1,9 @@
 require 'sinatra'
+configure { set :server, :puma }
 
 class Remapper < Sinatra::Base
 
-  set :server, 'puma'
+  #set :server, 'puma'
 
   get '/' do
     erb :index

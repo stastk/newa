@@ -2,4 +2,5 @@ require 'bundler'
 Bundler.require
 require './app'
 
-run Remapper
+#run Remapper
+run Sinatra::Application
