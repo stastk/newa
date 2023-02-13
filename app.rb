@@ -1,11 +1,8 @@
 require 'sinatra'
 
-set :run, true
-set :sever, 'thin'
-set :bind, '127.0.0.1'
-set :port, 80
-
-Process.daemon
+configure {
+  set :server, :puma
+}
 
 class Remapper < Sinatra::Base
 
@@ -17,5 +14,7 @@ class Remapper < Sinatra::Base
     content_type :json
     { something: "#{params[:t]}" }.to_json
   end
+
+  run! if app_file == $0
 
 end
