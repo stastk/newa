@@ -2,7 +2,7 @@ require 'sinatra'
 
 class Remapper < Sinatra::Base
 
-  set :server, 'thin'
+  set :server, 'puma'
 
   get '/' do
     erb :index
