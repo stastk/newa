@@ -72,8 +72,7 @@ class Remapper < Sinatra::Base
     end
 
     content_type :json
-    answer = {direction: direction.to_s, invert_direction: invert_direction.to_s, text: remapped.to_s}.to_json
-    puts answer
+    {direction: direction.to_s, invert_direction: invert_direction.to_s, text: remapped.to_s}.to_json
   end
 
   run! if app_file == $0
