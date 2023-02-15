@@ -71,7 +71,8 @@ class Remapper < Sinatra::Base
       remapped.gsub!(/(\s|[,])[#{space_gsubber.call(gg)}]/, " #{gg}")
     end
 
-    [direction.to_s, invert_direction.to_s, remapped.to_s].to_s
+    content_type :json
+    {direction: direction.to_s, invert_direction: invert_direction.to_s, text: remapped.to_s}.to_json
   end
 
   run! if app_file == $0
