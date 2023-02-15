@@ -24,8 +24,8 @@ class Remapper < Sinatra::Base
   end
 
   post '/remapper/v1' do
-    @text = params[:t] || ""
-    @direction = params[:d] || ""
+    @text = CGI.unescape(params[:t]) || ""
+    @direction = CGI.unescape(params[:d]) || ""
 
     remapped = ""
 
