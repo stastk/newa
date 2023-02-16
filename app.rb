@@ -72,9 +72,17 @@ class Remapper < Sinatra::Base
     end
 
     content_type :json
-    {direction: direction.to_s, invert_direction: invert_direction.to_s, text: CGI.unescape(remapped.to_s), enc: remapped.to_s.encoding}.to_json
+    {direction: direction.to_s, invert_direction: invert_direction.to_s, text: CGI.unescape(to_base64(remapped.to_s))}.to_json
+
   end
 
   run! if app_file == $0
+
+  private
+
+  def to_base64(string)
+    require 'base64'
+    Base64.encode64(string)
+  end
 
 end
