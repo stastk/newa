@@ -71,8 +71,13 @@ class Remapper < Sinatra::Base
       remapped.gsub!(/(\s|[,])[#{space_gsubber.call(gg)}]/, " #{gg}")
     end
 
+    remapped_array = []
+    remapped.each_char do |char|
+      remapped_array << to_unicode(char)
+    end
+
     content_type :json
-    {direction: direction.to_s, invert_direction: invert_direction.to_s, text: CGI.unescape(to_base64(remapped.to_s))}.to_json
+    {direction: direction.to_s, invert_direction: invert_direction.to_s, text: remapped_array}.to_json
 
   end
 
@@ -83,6 +88,15 @@ class Remapper < Sinatra::Base
   def to_base64(string)
     require 'base64'
     Base64.encode64(string)
+  end
+
+  def base64_to(string)
+    require 'base64'
+    Base64.decode64(string)
+  end
+
+  def to_unicode(string)
+    string.unpack('U*').map { |i| i.to_s(16).rjust(4, '0') }.join.to_i(16)
   end
 
 end
