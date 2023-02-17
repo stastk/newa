@@ -24,7 +24,7 @@ class Remapper < Sinatra::Base
   end
 
   post '/remapper/v1' do
-    @text = CGI.unescape(params[:t] || "")
+    @text = CGI.unescape(from_base64_to(params[:t]) || "")
     @direction = CGI.unescape(params[:d] || "")
 
     remapped = ""
@@ -90,13 +90,16 @@ class Remapper < Sinatra::Base
     Base64.encode64(string)
   end
 
-  def base64_to(string)
+  def from_base64_to(string)
     require 'base64'
     Base64.decode64(string)
   end
 
   def to_unicode(string)
-    string.unpack('U*').map { |i| i.to_s(16).rjust(4, '0') }.join.to_i(16)
+    string.to_s.unpack('U*').map { |i| i.to_s(16).rjust(4, '0') }.join.to_i(16)
   end
 
+  def from_unicode(array)
+    array.split(",").reject(&:empty?).map(&:to_i).pack('U*').to_s
+  end
 end
