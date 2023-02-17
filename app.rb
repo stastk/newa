@@ -24,7 +24,7 @@ class Remapper < Sinatra::Base
   end
 
   post '/remapper/v1' do
-    @text = CGI.unescape(from_base64_to(params[:t]) || "")
+    @text = from_unicode(from_base64_to(params[:t])) || ""
     @direction = CGI.unescape(params[:d] || "")
 
     remapped = ""
