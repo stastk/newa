@@ -43,21 +43,13 @@ class Remapper < Sinatra::Base
 
     @text.chars.each do |char|
       if char == "\n"
-        remapped += "\n\n"
-      elsif direction == "normal"
-        if ARR_PHIE.include? char
-          i = arr_from.find_index(char)
-          remapped += i.nil? ? char : arr_to[i]
-        elsif char == "\n"
-          remapped += "\n\n"
-        end
-      elsif direction == "gibberish"
-        if ARR_WOTC.include? char
-          i = arr_from.find_index(char)
-          remapped += i.nil? ? char : arr_to[i]
-        elsif char == "\n"
-          remapped += "\n\n"
-        end
+        remapped += "\n"
+      elsif direction == "normal" && ARR_PHIE.include?(char)
+        i = arr_from.find_index(char)
+        remapped += i.nil? ? char : arr_to[i]
+      elsif direction == "gibberish" && ARR_WOTC.include?(char)
+        i = arr_from.find_index(char)
+        remapped += i.nil? ? char : arr_to[i]
       end
     end
 
@@ -71,6 +63,8 @@ class Remapper < Sinatra::Base
       remapped.gsub!(/(\s|[,])[#{space_gsubber.call(gg)}]/, " #{gg}")
     end
 
+    remapped.gsub!(/^(\s|[,])+|(\s|[,])+$/, "")
+    
     remapped_array = []
     remapped.each_char do |char|
       remapped_array << to_unicode(char)
