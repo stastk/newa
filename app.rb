@@ -64,7 +64,8 @@ class Remapper < Sinatra::Base
     end
 
     remapped.gsub!(/(^(\s|[,])*|(\s|[,])*$)/, "")
-    remapped.gsub!(/([\.]\s{2,}[\|])|([\\.]\s{2,}[\^])/, "\r\n")
+    remapped.gsub!(/[\\.]\s{2,}[\|]/, ".\r\n|")
+    remapped.gsub!(/[\\.]\s{2,}[\^]/, ".\r\n^")
 
     remapped_array = []
     remapped.each_char do |char|
