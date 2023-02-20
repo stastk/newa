@@ -43,7 +43,7 @@ class Remapper < Sinatra::Base
 
     @text.chars.each do |char|
       if char == "\n"
-        remapped += "\n"
+        remapped += "\r\n"
       elsif direction == "normal" && ARR_PHIE.include?(char)
         i = arr_from.find_index(char)
         remapped += i.nil? ? char : arr_to[i]
