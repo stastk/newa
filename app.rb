@@ -40,26 +40,14 @@ class Remapper < Sinatra::Base
       direction = "normal"
       invert_direction = "gibberish"
     end
-
-    newlines = %w(, , ,  ,  )
-
+    
     @text.chars.each do |char|
-      if newlines.include? char || char == "\n"
-        remapped += "\n"
-      elsif direction == "normal"
-        if ARR_PHIE.include? char || char == "\n"
+      if direction == "normal" && ARR_PHIE.include?(char)
           i = arr_from.find_index(char)
           remapped += i.nil? ? char : arr_to[i]
-        elsif newlines.include? char
-          remapped += "\n"
-        end
-      elsif direction == "gibberish"
-        if ARR_WOTC.include? char
-          i = arr_from.find_index(char)
-          remapped += i.nil? ? char : arr_to[i]
-        elsif newlines.include? char || char == "\n"
-          remapped += "\n"
-        end
+      elsif direction == "gibberish" && ARR_WOTC.include?(char)
+        i = arr_from.find_index(char)
+        remapped += i.nil? ? char : arr_to[i]
       end
     end
 
