@@ -23,6 +23,57 @@ class Remapper < Sinatra::Base
     { something: "#{params[:t]}" }.to_json
   end
 
+  post 'remapper/v2' do
+
+    @text = params[:t] || ""
+    @direction = params[:d] || ""
+
+    remapped = ""
+
+    if @direction.to_s == "normal"
+      arr_from = ARR_WOTC
+      arr_to = ARR_PHIE
+      direction_to_normal = false
+    else
+      arr_from = ARR_PHIE
+      arr_to = ARR_WOTC
+      direction_to_normal = true
+    end
+
+    remap = lambda do |char|
+      i = arr_from.find_index(char)
+      remapped += i.nil? ? char : arr_to[i]
+    end
+
+    @text.chars.each do |char|
+      if char == "\n"
+        remapped += "\r\n"
+      elsif direction_to_normal && ARR_PHIE.include?(char) || !direction_to_normal && ARR_WOTC.include?(char)
+        remap.call(char)
+      end
+    end
+
+    space_gsubber = Proc.new{ |x| x == "^" ? "\\^" : x }
+
+    ARR_WOTC_GSUB_FROM_END.each do |char|
+      remapped.gsub!(/[#{space_gsubber.call(char)}](\s|[,])/, "#{char} ")
+    end
+
+    ARR_WOTC_GSUB_FROM_START.each do |char|
+      remapped.gsub!(/(\s|[,])[#{space_gsubber.call(char)}]/, " #{char}")
+    end
+
+    remapped.gsub!(/(^(\s|[,])*|(\s|[,])*$)/, "")
+    remapped_line_start_fix = direction_to_normal ? /[\\.]\s{2,}[\|]/ : /[\\.]\s{2,}[\^]/
+    remapped.gsub!(remapped_line_start_fix , ".\r\n|")
+
+    remapped_array = []
+    remapped.each_char do |char|
+      remapped_array << to_unicode(char)
+    end
+
+  end
+
   post '/remapper/v1' do
     @text = from_unicode(from_base64_to(params[:t])) || ""
     @direction = CGI.unescape(params[:d] || "")
