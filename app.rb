@@ -72,6 +72,9 @@ class Remapper < Sinatra::Base
       remapped_array << to_unicode(char)
     end
 
+    content_type :json
+    {direction: direction.to_s, invert_direction: invert_direction.to_s, text: remapped_array}.to_json
+
   end
 
   post '/remapper/v1' do
