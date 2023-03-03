@@ -1,9 +1,9 @@
 require 'sinatra'
 
-ARR_PHIE = %w(       0 1 2 3 4 5 6 7 8 9 ¯ - « ⅄ Ⅺ ⸘ ‽ ¿ ? ! * + e b d u i k Q E w h c m n o p C r L t Y l v s y & K O A % N Z H T J a _ I B U F G z V R $ M P f S W D D g / \\ ₀ ₁ ₂ ₃ ₄ ₅ ₆ ₇ ₈ ₉ ⁰ ¹ ² ³ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹ : ~ ­ . | ,) << " "
-ARR_WOTC = %w(       0 1 2 3 4 5 6 7 8 9 − - « Y X ⸘ ‽ ¿ ? ! * + a b d e f g h i j k l m n o p q r s t u v w x y z ð ø č ķ ŋ θ ţ ť ž ǆ ǥ ǧ ǩ ɒ ə ɢ ɣ ɬ ɮ ɴ ʁ π φ χ ẅ ’ ' š : / -0 -1 -2 -3 -4 -5 -6 -7 -8 -9 +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 , " “ . ^) << " " << ","
-ARR_WOTC_GSUB_FROM_START = %w(¿ “ ‽ ⸘ ? ! " ^ «)
-ARR_WOTC_GSUB_FROM_END = %w(: - “ « . ^)
+ARR_GIBBERISH = %w(       0 1 2 3 4 5 6 7 8 9 ¯ - « ⅄ Ⅺ ⸘ ‽ ¿ ? ! * + e b d u i k Q E w h c m n o p C r L t Y l v s y & K O A % N Z H T J a _ I B U F G z V R $ M P f S W D D g / \\ ₀ ₁ ₂ ₃ ₄ ₅ ₆ ₇ ₈ ₉ ⁰ ¹ ² ³ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹ : ~ ­ . | ,) << " "
+ARR_NORMAL = %w(       0 1 2 3 4 5 6 7 8 9 − - « Y X ⸘ ‽ ¿ ? ! * + a b d e f g h i j k l m n o p q r s t u v w x y z ð ø č ķ ŋ θ ţ ť ž ǆ ǥ ǧ ǩ ɒ ə ɢ ɣ ɬ ɮ ɴ ʁ π φ χ ẅ ’ ' š : / -0 -1 -2 -3 -4 -5 -6 -7 -8 -9 +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 , " “ . ^) << " " << ","
+ARR_NORMAL_GSUB_FROM_START = %w(¿ “ ‽ ⸘ ? ! " ^ «)
+ARR_NORMAL_GSUB_FROM_END = %w(: - “ « . ^)
 
 PHIE_ALIAS = "gibbersih"
 WOTC_ALIAS = "normal"
@@ -31,13 +31,13 @@ class Remapper < Sinatra::Base
     remapped = ""
 
     if @direction_from.to_s == "normal"
-      arr_from = ARR_WOTC
-      arr_to = ARR_PHIE
-      direction_from_gibberish_to_normal = false
+      arr_from = ARR_NORMAL
+      arr_to = ARR_GIBBERISH
+      direction_gibberish_to_normal = false
     else
-      arr_from = ARR_PHIE
-      arr_to = ARR_WOTC
-      direction_from_gibberish_to_normal = true
+      arr_from = ARR_GIBBERISH
+      arr_to = ARR_NORMAL
+      direction_gibberish_to_normal = true
     end
 
     remap = lambda do |char|
@@ -48,23 +48,23 @@ class Remapper < Sinatra::Base
     @text.chars.each do |char|
       if char == "\n"
         remapped += "\r\n"
-      elsif direction_from_gibberish_to_normal && ARR_PHIE.include?(char) || !direction_from_gibberish_to_normal && ARR_WOTC.include?(char)
+      elsif direction_gibberish_to_normal && ARR_GIBBERISH.include?(char) || !direction_gibberish_to_normal && ARR_NORMAL.include?(char)
         remap.call(char)
       end
     end
 
     space_gsubber = Proc.new{ |x| x == "^" ? "\\^" : x }
 
-    ARR_WOTC_GSUB_FROM_END.each do |char|
+    ARR_NORMAL_GSUB_FROM_END.each do |char|
       remapped.gsub!(/[#{space_gsubber.call(char)}](\s|[,])/, "#{char} ")
     end
 
-    ARR_WOTC_GSUB_FROM_START.each do |char|
+    ARR_NORMAL_GSUB_FROM_START.each do |char|
       remapped.gsub!(/(\s|[,])[#{space_gsubber.call(char)}]/, " #{char}")
     end
 
     remapped.gsub!(/(^(\s|[,])*|(\s|[,])*$)/, "")
-    remapped_line_start_fix = direction_from_gibberish_to_normal ? /[\\.]\s{2,}[\|]/ : /[\\.]\s{2,}[\^]/
+    remapped_line_start_fix = direction_gibberish_to_normal ? /[\\.]\s{2,}[\|]/ : /[\\.]\s{2,}[\^]/
     remapped.gsub!(remapped_line_start_fix , ".\r\n|")
 
     remapped_array = []
@@ -73,7 +73,7 @@ class Remapper < Sinatra::Base
     end
 
     content_type :json
-    {to_normal: direction_from_gibberish_to_normal ? 1 : 0, text: remapped_array}.to_json
+    {to_normal: direction_gibberish_to_normal ? 1 : 0, text: remapped_array}.to_json
 
   end
 
@@ -84,13 +84,13 @@ class Remapper < Sinatra::Base
     remapped = ""
 
     if @direction.to_s == "normal"
-      arr_from = ARR_WOTC
-      arr_to = ARR_PHIE
+      arr_from = ARR_NORMAL
+      arr_to = ARR_GIBBERISH
       direction = "gibberish"
       invert_direction = "normal"
     else
-      arr_from = ARR_PHIE
-      arr_to = ARR_WOTC
+      arr_from = ARR_GIBBERISH
+      arr_to = ARR_NORMAL
       direction = "normal"
       invert_direction = "gibberish"
     end
@@ -98,10 +98,10 @@ class Remapper < Sinatra::Base
     @text.chars.each do |char|
       if char == "\n"
         remapped += "\r\n"
-      elsif direction == "normal" && ARR_PHIE.include?(char)
+      elsif direction == "normal" && ARR_GIBBERISH.include?(char)
         i = arr_from.find_index(char)
         remapped += i.nil? ? char : arr_to[i]
-      elsif direction == "gibberish" && ARR_WOTC.include?(char)
+      elsif direction == "gibberish" && ARR_NORMAL.include?(char)
         i = arr_from.find_index(char)
         remapped += i.nil? ? char : arr_to[i]
       end
@@ -109,11 +109,11 @@ class Remapper < Sinatra::Base
 
     space_gsubber = ->(x){x == "^" ? "\\^" : x}
 
-    ARR_WOTC_GSUB_FROM_END.each do |gg|
+    ARR_NORMAL_GSUB_FROM_END.each do |gg|
       remapped.gsub!(/[#{space_gsubber.call(gg)}](\s|[,])/, "#{gg} ")
     end
 
-    ARR_WOTC_GSUB_FROM_START.each do |gg|
+    ARR_NORMAL_GSUB_FROM_START.each do |gg|
       remapped.gsub!(/(\s|[,])[#{space_gsubber.call(gg)}]/, " #{gg}")
     end
 
