@@ -73,7 +73,7 @@ class Remapper < Sinatra::Base
     end
 
     content_type :json
-    {direction: direction.to_s, invert_direction: invert_direction.to_s, text: remapped_array}.to_json
+    {to_normal: direction_to_normal ? 1 : 0, text: remapped_array}.to_json
 
   end
 
