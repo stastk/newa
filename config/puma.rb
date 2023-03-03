@@ -7,4 +7,4 @@ rackup "#{root}/config.ru"
 
 threads 4, 8
 
-daemonize
+#daemonize
