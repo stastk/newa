@@ -73,7 +73,7 @@ class Remapper < Sinatra::Base
     end
 
     content_type :json
-    {to_normal: direction_gibberish_to_normal ? 1 : 0, text: remapped_array}.to_json
+    {direction: direction_gibberish_to_normal ? "gibberish" : "normal", invert_direction: direction_gibberish_to_normal ? "normal" : "gibberish", text: remapped_array}.to_json
 
   end
 
