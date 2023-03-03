@@ -23,7 +23,7 @@ class Remapper < Sinatra::Base
     { something: "#{params[:t]}" }.to_json
   end
 
-  post 'remapper/v2' do
+  post '/remapper/v2' do
 
     @text = params[:t] || ""
     @direction = params[:d] || ""
