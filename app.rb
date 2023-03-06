@@ -27,18 +27,17 @@ class Remapper < Sinatra::Base
 
     @text = params[:t] || ""
     @direction_from = params[:d] || ""
+    @direction_to = @direction_from == "gibberish" ? "normal" : "gibberish"
 
-    remapped = ""
-
-    if @direction_from.to_s == "normal"
+    if @direction_from == "normal"
       arr_from = ARR_NORMAL
       arr_to = ARR_GIBBERISH
-      direction_gibberish_to_normal = false
-    else
+    elsif @direction_from == "gibberish"
       arr_from = ARR_GIBBERISH
       arr_to = ARR_NORMAL
-      direction_gibberish_to_normal = true
     end
+
+    remapped = ""
 
     remap = lambda do |char|
       i = arr_from.find_index(char)
@@ -48,7 +47,7 @@ class Remapper < Sinatra::Base
     @text.chars.each do |char|
       if char == "\n"
         remapped += "\r\n"
-      elsif direction_gibberish_to_normal && ARR_GIBBERISH.include?(char) || !direction_gibberish_to_normal && ARR_NORMAL.include?(char)
+      elsif @direction_from == "normal" && ARR_GIBBERISH.include?(char) || @direction_from == "gibberish" && ARR_NORMAL.include?(char)
         remap.call(char)
       end
     end
@@ -64,7 +63,7 @@ class Remapper < Sinatra::Base
     end
 
     remapped.gsub!(/(^(\s|[,])*|(\s|[,])*$)/, "")
-    remapped_line_start_fix = direction_gibberish_to_normal ? /[\\.]\s{2,}[\|]/ : /[\\.]\s{2,}[\^]/
+    remapped_line_start_fix = direction_from_gibberish ? /[\\.]\s{2,}[\|]/ : /[\\.]\s{2,}[\^]/
     remapped.gsub!(remapped_line_start_fix , ".\r\n|")
 
     remapped_array = []
@@ -73,7 +72,7 @@ class Remapper < Sinatra::Base
     end
 
     content_type :json
-    {direction: direction_gibberish_to_normal ? "gibberish" : "normal", invert_direction: direction_gibberish_to_normal ? "normal" : "gibberish", text: remapped_array}.to_json
+    {direction_from: @direction_from, direction_to: @direction_to, text: remapped_array}.to_json
 
   end
 
