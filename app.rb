@@ -63,7 +63,7 @@ class Remapper < Sinatra::Base
     end
 
     remapped.gsub!(/(^(\s|[,])*|(\s|[,])*$)/, "")
-    remapped_line_start_fix = direction_from_gibberish ? /[\\.]\s{2,}[\|]/ : /[\\.]\s{2,}[\^]/
+    remapped_line_start_fix = @direction_from == "normal" ? /[\\.]\s{2,}[\^]/ : /[\\.]\s{2,}[\|]/
     remapped.gsub!(remapped_line_start_fix , ".\r\n|")
 
     remapped_array = []
