@@ -18,8 +18,6 @@ class AppTest < Test::Unit::TestCase
 
     get '/'
     assert last_response.ok?
-    #expect(last_response.status).to eq 500
-    #assert_equal 'WTФ', last_response.body
   end
 
   def test_v1_api
