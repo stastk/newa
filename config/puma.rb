@@ -6,5 +6,6 @@ state_path "#{root}/tmp/puma/state"
 rackup "#{root}/config.ru"
 
 threads 4, 8
-
-#daemonize
+if settings.production?
+  daemonize
+end

@@ -73,7 +73,6 @@ class Remapper < Sinatra::Base
 
     content_type :json
     {direction_from: @direction_from, direction_to: @direction_to, text: remapped_array}.to_json
-
   end
 
   post '/remapper/v1' do
