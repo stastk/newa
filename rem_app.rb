@@ -25,7 +25,7 @@ class Remapper < Sinatra::Base
 
   post '/remapper/v2' do
 
-    @text = params[:t] || ""
+    @text = from_unicode(from_base64_to(params[:t])) || ""
     @direction_from = params[:d] || ""
     @direction_to = @direction_from == "gibberish" ? "normal" : "gibberish"
 
@@ -47,7 +47,7 @@ class Remapper < Sinatra::Base
     @text.chars.each do |char|
       if char == "\n"
         remapped += "\r\n"
-      elsif @direction_from == "normal" && ARR_GIBBERISH.include?(char) || @direction_from == "gibberish" && ARR_NORMAL.include?(char)
+      elsif @direction_from == "gibberish" && ARR_GIBBERISH.include?(char) || @direction_from == "normal" && ARR_NORMAL.include?(char)
         remap.call(char)
       end
     end
@@ -63,7 +63,7 @@ class Remapper < Sinatra::Base
     end
 
     remapped.gsub!(/(^(\s|[,])*|(\s|[,])*$)/, "")
-    remapped_line_start_fix = @direction_from == "normal" ? /[\\.]\s{2,}[\^]/ : /[\\.]\s{2,}[\|]/
+    remapped_line_start_fix = @direction_from == "gibberish" ? /[\\.]\s{2,}[\^]/ : /[\\.]\s{2,}[\|]/
     remapped.gsub!(remapped_line_start_fix , ".\r\n|")
 
     remapped_array = []

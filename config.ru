@@ -1,5 +1,5 @@
 require 'bundler'
 Bundler.require
-require './app'
+require './rem_app'
 
 run Remapper
